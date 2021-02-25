@@ -1,3 +1,9 @@
+# Подключаем класс Post и его детей: Memo, Link, Task
+require_relative 'lib/post'
+require_relative 'lib/memo'
+require_relative 'lib/link'
+require_relative 'lib/task'
+
 # Поздороваемся с пользователем и просим у него, что он хочет создать.
 
 puts 'Привет, я твой блокнот!'
