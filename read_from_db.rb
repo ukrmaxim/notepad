@@ -4,7 +4,6 @@ require_relative 'lib/link'
 require_relative 'lib/task'
 require 'optparse'
 
-# Все наши опции будут записаны сюда
 options = {}
 
 # Заведем нужные нам опции
@@ -27,7 +26,7 @@ OptionParser.new do |opt|
   # Опция --limit передает, сколько записей мы хотим прочитать из базы
   opt.on('--limit NUMBER', 'сколько последних постов показать (по умолчанию все)') { |o| options[:limit] = o }
 
-  # В конце у только что созданного объекта класс OptionParser вызываем
+  # В конце у только что созданного объекта класса OptionParser вызываем
   # метод parse, чтобы он заполнил наш хэш options в соответствии с правилами.
 end.parse!
 
@@ -46,7 +45,7 @@ if result.is_a? Post
   puts "Запись #{result.class.name}, id = #{options[:id]}"
 
   # Получим строки для поста с помощью метода to_string и выведем их на экран
-  result.to_strings.each { |line| puts line }
+  result.to_string.each { |line| puts line }
 else
   # Если результат — это не один пост, а сразу несколько, показываем таблицу
 

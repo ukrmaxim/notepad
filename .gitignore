@@ -1,5 +1,4 @@
-.idea
-Memo*
-Link*
-Task*
-notepad.sqlite
+.idea/
+.bundle/
+.vscode/
+/notepad.sqlite
