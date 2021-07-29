@@ -1,7 +1,8 @@
-Notepad v2.0
+Notepad v2.1
 =
 
-An educational console application Notepad that uses a SQLite database to store data. Supports the following types of notes: Memo, Task, Link.
+An educational console application Notepad that uses a SQLite database to store data. Supports the following types
+of notes: Memo, Task, Link.
 
 Requirements
 -
@@ -26,25 +27,12 @@ Quick start
 
 ### Attention
 
-For correctly application work, you need install a Ruby gem 'sqlite3' (<https://github.com/sparklemotion/sqlite3-ruby>).
-For gem installation, on command line/terminal, go to the directory, where you unpacked the archive and type in the
-following commands:
+Before run  the app, on command line/terminal, go to the directory, where you clone repository and type in the
+following command:
 
 ```ruby
 bundle install
 ```
-
-You also need to create a SQLite database named 'notepad.sqlite' and then create a 'posts' table with the following fields:
-
-```ruby
-type:text
-created_at:numeric
-text:text
-url:text
-due_date:text
-```
-
-To work with SQLite databases, you can use 'SQLiteStudio' (<https://github.com/pawelsalawa/sqlitestudio>)
 
 Instructions how to use
 -
