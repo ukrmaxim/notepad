@@ -40,7 +40,12 @@ result = if options[:id].nil?
            Post.find_by_id(options[:id])
          end
 
-if result.is_a? Post
+case result
+when nil
+  exit
+when []
+  puts 'Записи отсутствуют'
+when Post
   # Если результат — это один объект класса Post, значит выводим его
   puts "Запись #{result.class.name}, id = #{options[:id]}"
 

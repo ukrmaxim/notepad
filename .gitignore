@@ -1,4 +1,3 @@
-.idea/
 .bundle/
-.vscode/
-/notepad.db
+/*.db
+/*.sqlite

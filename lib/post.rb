@@ -2,10 +2,7 @@ require 'sqlite3'
 
 # Родительский класс «Post» — здесь мы определим основные методы и свойства, общие для всех типов записей.
 class Post
-  # Создаем файл базы данных и таблицу posts, если они еще не созданы
-  db_file = SQLite3::Database.open 'notepad.db'
-  db_file.execute 'CREATE TABLE IF NOT EXISTS posts (type TEXT, created_at NUMERIC, text TEXT, url TEXT, due_date TEXT)'
-  @sqlite_db = 'notepad.db'.freeze
+  SQLITE_DB = 'notepad.db'.freeze
 
   # Теперь нам нужно будет читать объекты из базы данных поэтому удобнее всегда
   # иметь под рукой связь между классом и его именем в виде строки
@@ -18,8 +15,13 @@ class Post
     post_types[type].new
   end
 
+  def self.create_db
+    db_file = SQLite3::Database.open 'notepad.db'
+    db_file.execute 'CREATE TABLE IF NOT EXISTS posts (type TEXT, created_at NUMERIC, text TEXT, url TEXT, due_date TEXT)'
+  end
+
   def initialize
-    @created_at = Time.now
+    @created_at = Time.now.getlocal.strftime('%m.%d.%Y %H:%M')
     @text = []
   end
 
@@ -30,7 +32,7 @@ class Post
     # Открываем «соединение» с базой SQLite, вызывая метод open класса
     # SQLite3::Database, и сохраняем результат в переменную класса db
 
-    db = SQLite3::Database.open(@sqlite_db)
+    db = SQLite3::Database.open(SQLITE_DB)
     # Настройка для объекта db, которая говорит, что результаты из базы должны быть преобразованы в хэш руби.
     db.results_as_hash = true
     # Выполняем наш запрос, вызывая метод execute у объекта db. Он возвращает массив результатов, в нашем случае
@@ -38,10 +40,9 @@ class Post
     # соответствует заданному». Результат сохраняем в переменную result.
     begin
       result = db.execute('SELECT * FROM posts WHERE  rowid = ?', id)
-    rescue SQLite3::SQLException => e
-      # Если возникла ошибка, пишем об этом пользователю и выводим текст ошибки
-      puts "Не удалось выполнить запрос в базе #{@sqlite_db}"
-      abort e.message
+    rescue SQLite3::SQLException
+      create_db
+      retry
     end
 
     # Закрываем соединение с базой. Оно нам больше не нужно, результат запроса у нас сохранен.
@@ -51,7 +52,7 @@ class Post
 
     if result.empty?
       # Если массив результатов пуст, означает, что запись не найдена, надо сообщить об этом пользователю и вернуть nil.
-      puts "Такой id #{id} не найден в базе :("
+      puts "Запись с id: #{id} в базе отсутствует :("
       nil
     else
       # Если массив не пустой, значит пост нашелся и лежит первым элементом.
@@ -79,8 +80,9 @@ class Post
     end
   end
 
+  # rubocop:disable Metrics/AbcSize
   def self.find_all(limit, type)
-    db = SQLite3::Database.open(@sqlite_db)
+    db = SQLite3::Database.open(SQLITE_DB)
     # Ищем все посты указанного типа (если в метод передали переменную type). Но для начала скажем нашему объекту
     # соединения, что результаты не нужно преобразовывать к хэшу.
     db.results_as_hash = false
@@ -101,9 +103,9 @@ class Post
     begin
       # Готовим запрос в базу
       statement = db.prepare query
-    rescue SQLite3::SQLException => e
-      puts "Не удалось выполнить запрос в базе #{@sqlite_db}"
-      abort e.message
+    rescue SQLite3::SQLException
+      create_db
+      retry
     end
 
     # Загружаем в запрос тип вместо плейсхолдера :type
@@ -116,9 +118,9 @@ class Post
     # Перед запросом поставим конструкцию begin, чтобы поймать возможные ошибки например, если в базе нет таблицы posts.
     begin
       result = statement.execute!
-    rescue SQLite3::SQLException => e
-      puts "Не удалось выполнить запрос в базе #{@sqlite_db}"
-      abort e.message
+    rescue SQLite3::SQLException
+      create_db
+      retry
     end
 
     statement.close
@@ -127,6 +129,7 @@ class Post
 
     result
   end
+  # rubocop:enable Metrics/AbcSize
 
   def load_data(data_hash)
     # Общее для всех детей класса Post поведение описано в методе экземпляра класса Post.
@@ -141,16 +144,19 @@ class Post
   end
 
   def save_to_db
-    db = SQLite3::Database.open(@sqlite_db)
+    db = SQLite3::Database.open(SQLITE_DB)
     db.results_as_hash = true
 
-    db.execute('INSERT INTO posts (' + to_db_hash.keys.join(', ') + ')' +
-                 'VALUES (' + ('?,' * to_db_hash.keys.size).chomp(',') + ')', to_db_hash.values)
+    begin
+      db.execute("INSERT INTO posts (#{to_db_hash.keys.join(', ')})
+                 VALUES (#{('?,' * to_db_hash.keys.size).chomp(',')})", to_db_hash.values)
+    rescue SQLite3::SQLException
+      create_db
+      retry
+    end
 
     insert_row_id = db.last_insert_row_id
-
     db.close
-
     insert_row_id
   end
 

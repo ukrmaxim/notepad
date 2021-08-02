@@ -31,7 +31,7 @@ Before run  the app, on command line/terminal, go to the directory, where you cl
 following command:
 
 ```ruby
-bundle install
+bundle exec install
 ```
 
 Instructions how to use
