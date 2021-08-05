@@ -31,7 +31,7 @@ Before run  the app, on command line/terminal, go to the directory, where you cl
 following command:
 
 ```ruby
-bundle exec install
+bundle
 ```
 
 Instructions how to use
@@ -41,20 +41,20 @@ To create a record, in command line/terminal, go to the directory, where you unp
 following command:
 
 ```ruby
-ruby write_to_db.rb
+bundle exec ruby write_to_db.rb
 ```
 
 To read all record, in command line/terminal, go to the directory, where you unpacked the archive and type in the
 following command:
 
 ```ruby
-ruby read_from_db.rb
+bundle exec ruby read_from_db.rb
 ```
 
 Command with key `-h` will show additional startup options:
 
 ```ruby
-ruby read_from_db.rb -h
+bundle exec ruby read_from_db.rb -h
 
 --type POST_TYPE (example: ruby read_from_db.rb --type Link)
 --id POST_ID (example: ruby read_from_db.rb --id 6)
